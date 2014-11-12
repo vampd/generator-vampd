@@ -2,6 +2,7 @@
 var util = require('util'),
     path = require('path'),
     chalk = require('chalk'),
+    sh = require('execSync'),
     yeoman = require('yeoman-generator'),
     yosay = require('yosay');
 
@@ -370,9 +371,15 @@ vampdGenerator.prototype.vampdDrupalSiteSettings = function vampdDrupalSiteSetti
     done();
   }.bind(this));
 }
+
+// Pipe this to JSON
 vampdGenerator.prototype.vampdSettingsToJSON = function vampdSettingsToJSON() {
 
   this.log("Thank you so much! Your site role file will generate in a few moments");
-  this.template('role.json', this.machineId + '.json');
+  var mID = this.machineId;
+  if (!this.options['skip-install'] || !this.options['skip-setup']) {
+    sh.run('git clone https://github.com/vampd/vampd.git ' + ' ./' + mID);
+  }
 
+  this.template('role.json', './' + mID + '/chef/roles/' + mID +'.json');
 }
