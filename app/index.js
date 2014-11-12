@@ -386,14 +386,17 @@ module.exports = generators.Base.extend({
       done();
     }.bind(this));
   },
-
+  //
   // Pipe this to JSON
   vampdSettingsToJSON: function () {
 
     this.log("Thank you so much! Your site role file will generate in a few moments");
     var mID = this.machineId;
     if (!this.options['skip-install']) {
-      sh.run('git clone https://github.com/vampd/vampd.git ' + ' ./' + mID);
+      var projPath = './' + mID;
+      if (!path.exists(projPath)) {
+        sh.run('git clone https://github.com/vampd/vampd.git ' + ' ./' + mID);
+      }
     }
 
     this.template('role.json', './' + mID + '/chef/roles/' + mID +'.json');
