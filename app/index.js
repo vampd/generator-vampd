@@ -377,7 +377,7 @@ vampdGenerator.prototype.vampdSettingsToJSON = function vampdSettingsToJSON() {
 
   this.log("Thank you so much! Your site role file will generate in a few moments");
   var mID = this.machineId;
-  if (!this.options['skip-install'] || !this.options['skip-setup']) {
+  if (!this.options['skip-install']) {
     sh.run('git clone https://github.com/vampd/vampd.git ' + ' ./' + mID);
   }
 
