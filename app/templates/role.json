@@ -22,7 +22,8 @@
                 "default": {
                   "location": "<%= drupalSiteSettings %>"
                 }
-              }
+              },
+              "db_file": "<%= dbFile %>"
             }
           },
           "repository": {

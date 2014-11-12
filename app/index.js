@@ -32,6 +32,8 @@ vampdGenerator.prototype.vampdInit = function vampdInit() {
   var done = this.async(),
       prompts = [];
 
+  this.machineId = this.config.get('machineId');
+
   prompts.push({
     type: 'string',
     name: 'machineId',
@@ -63,6 +65,11 @@ vampdGenerator.prototype.vampdInit = function vampdInit() {
 vampdGenerator.prototype.vampdGit = function vampdGit() {
   var done = this.async(),
       prompts = [];
+
+  this.gitHost = this.config.get('gitHost');
+  this.gitURI = this.config.get('gitURI');
+  this.gitRevision = this.config.get('gitRevision');
+
   if (this.git) {
     // Ask gor the githost
     prompts.push({
@@ -138,6 +145,7 @@ vampdGenerator.prototype.vampdActions = function vampdActions() {
   }
   this.log("If you aren\'t sure what to select, go with the defaults.")
   this.log("Everything is editable later. ");
+
   var actionChoices = [
     {
       name: "deploy",
@@ -183,7 +191,6 @@ vampdGenerator.prototype.vampdActions = function vampdActions() {
     var actionsJSON = JSON.stringify(answers.actions, null, "");
     this.actions = answers.actions;
     this.actionsJSON = actionsJSON;
-    this.log( this.actions.indexOf('install') );
     done();
   }.bind(this));
 }
@@ -192,7 +199,7 @@ vampdGenerator.prototype.vampdActions = function vampdActions() {
 vampdGenerator.prototype.vampdInstall = function vampdInstall() {
   var done = this.async(),
       prompts = [];
-  this.drupalProfile = 'standard';
+  this.drupalProfile = this.config.get('drupalProfile');
 
   if ( this.actions.indexOf('install') >= 0 ) {
     prompts.push({
@@ -218,6 +225,7 @@ vampdGenerator.prototype.vampdInstall = function vampdInstall() {
 vampdGenerator.prototype.vampdImport = function vampdImport() {
   var done = this.async(),
       prompts = [];
+  this.dbFile = this.config.get('dbFile');
   if ( this.actions.indexOf('import') >= 0 ) {
     prompts.push({
       type: 'string',
@@ -241,6 +249,9 @@ vampdGenerator.prototype.vampdImport = function vampdImport() {
 vampdGenerator.prototype.vampdDrupalVersion = function vampdDrupalVersion() {
   var done = this.async(),
       prompts = [];
+
+  this.drupalVersion = this.config.get('drupalVersion');
+
   if ( this.git ) {
     prompts.push({
       type: "checkbox",
@@ -271,7 +282,7 @@ vampdGenerator.prototype.vampdDrupalVersion = function vampdDrupalVersion() {
   }.bind(this));
 }
 
-// Get the Docroot
+// See if a Docroot is needed
 vampdGenerator.prototype.vampdDrupalDocrootInit = function vampdDrupalDocrootInit() {
   var done = this.async(),
       prompts = [];
@@ -292,10 +303,13 @@ vampdGenerator.prototype.vampdDrupalDocrootInit = function vampdDrupalDocrootIni
   }.bind(this));
 }
 
-// Get the Docroot
+// Get the Docroot, if it is needed
 vampdGenerator.prototype.vampdDrupalDocroot = function vampdDrupalDocroot() {
   var done = this.async(),
       prompts = [];
+
+  this.drupalDocroot = this.config.get('drupalDocroot');
+
   if ( this.drupalDocrootInit ) {
     prompts.push({
       type: 'string',
@@ -321,7 +335,7 @@ vampdGenerator.prototype.vampdDrupalDocroot = function vampdDrupalDocroot() {
 vampdGenerator.prototype.vampdDrupalSiteFiles = function vampdDrupalSiteFiles() {
   var done = this.async(),
       prompts = [];
-
+  this.drupalSiteFiles = this.config.get('drupalSiteFiles');
   if ( this.git ) {
     prompts.push({
       type: 'string',
@@ -349,6 +363,9 @@ vampdGenerator.prototype.vampdDrupalSiteFiles = function vampdDrupalSiteFiles() 
 vampdGenerator.prototype.vampdDrupalSiteSettings = function vampdDrupalSiteSettings() {
   var done = this.async(),
       prompts = [];
+
+  this.drupalSiteSettings = this.config.get('drupalSiteSettings');
+
   if ( this.git ) {
     prompts.push({
       type: 'string',
