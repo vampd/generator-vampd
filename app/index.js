@@ -142,7 +142,7 @@ module.exports = generators.Base.extend({
       this.log(chalk.yellow("[update]") + " -- runs update.php.")
     }
     this.log("If you aren\'t sure what to select, go with the defaults.")
-    this.log("Everything is editable later. ");
+    this.log("Everything is editable later.");
 
     var actionChoices = [
       {
@@ -372,7 +372,7 @@ module.exports = generators.Base.extend({
         default: 'sites/default/settings.php',
         validate: function (answer) {
           if ( answer === '' ) {
-            return 'Your files must live somewhere. Please give them a home.';
+            return 'Your settings.php must live somewhere. Please give it a home.';
           }
           return true;
         }
