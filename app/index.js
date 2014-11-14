@@ -4,11 +4,13 @@ var util = require('util'),
     chalk = require('chalk'),
     sh = require('execSync'),
     generators = require('yeoman-generator'),
+    file = require('yeoman-generator').file,
     yosay = require('yosay');
 
 module.exports = generators.Base.extend({
   contructor: function() {
     var defaultSettings = {
+      vampdHome: process.env.PWD,
       machineId: 'example',
       gitHost: 'github.com',
       gitURI: 'https://github.com/drupal/drupal.git',
@@ -28,10 +30,21 @@ module.exports = generators.Base.extend({
   // Initialize by asking product name
   vampdInit: function () {
     var done = this.async(),
-        prompts = [];
+        prompts = [],
+        locationTense = 'should';
+    // Set location tense if a new role
+    if (this.options['new-role']) {
+      locationTense = 'does'
+    }
+    this.vampdHome = this.config.get('vampdHome');
+    prompts.push({
+      type:'string',
+      name: 'vampdHome',
+      default: this.config.get('vampdHome'),
+      message: 'Where ' + locationTense + ' vampd live?',
+    });
 
     this.machineId = this.config.get('machineId');
-
     prompts.push({
       type: 'string',
       name: 'machineId',
@@ -53,6 +66,7 @@ module.exports = generators.Base.extend({
 
     // Bind the initial prompts
     this.prompt(prompts, function (answers) {
+      this.vampdHome = answers.vampdHome;
       this.machineId = answers.machineId;
       this.git = answers.git;
       done();
@@ -74,7 +88,7 @@ module.exports = generators.Base.extend({
         type: 'string',
         name: 'gitURI',
         message: 'What is the git host?',
-        default: 'github.com'
+        default: this.config.get('gitHost')
       });
       // Ask for uri
       prompts.push({
@@ -392,13 +406,13 @@ module.exports = generators.Base.extend({
 
     this.log("Thank you so much! Your site role file will generate in a few moments");
     var mID = this.machineId;
-    if (!this.options['skip-install']) {
-      var projPath = './' + mID;
-      if (!path.exists(projPath)) {
-        sh.run('git clone https://github.com/vampd/vampd.git ' + ' ./' + mID);
-      }
+    if ( !this.options['new-role'] ) {
+        sh.run('git clone https://github.com/vampd/vampd.git ' + this.vampdHome);
     }
+    // Set the destination root to where we specified.
+    this.destinationRoot(this.vampdHome);
 
-    this.template('role.json', './' + mID + '/chef/roles/' + mID +'.json');
+    this.template('role.json', this.vampdHome + '/chef/roles/' + mID +'.json');
+
   },
 });
