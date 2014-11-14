@@ -21,7 +21,8 @@ module.exports = generators.Base.extend({
       dbFile: '',
       drupalVersion: "7.x",
       drupalSiteSettings: 'sites/default/settings.php',
-      drupalSiteFiles: 'site/default/files'
+      drupalSiteFiles: 'site/default/files',
+      vagrantIP: '192.168.50.5'
     }
 
     this.config.defaults(defaultSettings);
@@ -43,7 +44,24 @@ module.exports = generators.Base.extend({
       default: this.config.get('vampdHome'),
       message: 'Where ' + locationTense + ' vampd live?',
     });
-
+    if (this.options['new-role']) {
+      this.vagrantIP = this.config.get('vagrantIP');
+      this.log('Your private vagrant IP can be found in your Vagrantfile');
+      this.log("If you didn't touch this, just hit enter");
+      prompts.push({
+        type:'string',
+        name: 'vagrantIP',
+        default: this.config.get('vagrantIP'),
+        message: 'What is the private vagrant IP?',
+        validate: function (answer) {
+          if ( answer === '' ) {
+            return 'Your site must have an IP';
+          }
+          return true;
+        }
+      });
+    }
+    // Get the Machine ID
     this.machineId = this.config.get('machineId');
     prompts.push({
       type: 'string',
@@ -407,12 +425,31 @@ module.exports = generators.Base.extend({
     this.log("Thank you so much! Your site role file will generate in a few moments");
     var mID = this.machineId;
     if ( !this.options['new-role'] ) {
-        sh.run('git clone https://github.com/vampd/vampd.git ' + this.vampdHome);
+      sh.run('git clone https://github.com/vampd/vampd.git ' + this.vampdHome);
     }
     // Set the destination root to where we specified.
     this.destinationRoot(this.vampdHome);
 
     this.template('role.json', this.vampdHome + '/chef/roles/' + mID +'.json');
 
+    // Add the ip to the /etc/hosts
+    sh.run('sudo echo ' + this.vagrantIP + '   ' + mID+ '.local'+ ' >> /etc/hosts');
+
+    this.log("------");
+    if ( this.options['new-role'] ) {
+      this.log(chalk.green('Your new role is created and ready to use.'));
+      this.log(chalk.magenta('If your site is ready to provision...'));
+      this.log(chalk.cyan('vagrant provision') + ' in your working vampd directory');
+      this.log('and add the following line to your ' + chalk.cyan('/etc/hosts'));
+      this.log(chalk.cyan(this.vagrantIP + '   ' + mID + '.local'));
+    } else {
+      this.log(chalk.green('Your installation is complete'));
+      this.log(chalk.green('Navigate to your project directory:'));
+      this.log(chalk.cyan('cd' + this.vampdHome));
+      this.log(chalk.green('and run the following command'));
+      this.log(chalk.cyan('vagrant up'));
+      t
+    }
+    this.log("------");
   },
 });
