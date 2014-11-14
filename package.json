@@ -1,14 +1,14 @@
 {
   "name": "generator-vampd",
-  "version": "0.0.0",
-  "description": "Yeoman generator",
+  "version": "0.1.0",
+  "description": "Yeoman generator for VAMPD",
   "license": "MIT",
   "main": "app/index.js",
-  "repository": "timodwhit/generator-vampd",
+  "repository": "vampd/generator-vampd",
   "author": {
     "name": "Tim Whitney",
     "email": "",
-    "url": "https://github.com/timodwhit"
+    "url": "https://github.com/vampd"
   },
   "engines": {
     "node": ">=0.10.0"
