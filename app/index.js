@@ -57,6 +57,8 @@ module.exports = generators.Base.extend({
   vampdIP: function(){
     var done = this.async(),
         prompts = [];
+    // Say something to start:
+    this.log(yosay('Welcome to VAMPD.'));
 
     this.vagrantIP = this.config.get('vagrantIP');
 
