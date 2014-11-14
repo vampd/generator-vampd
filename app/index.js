@@ -29,6 +29,8 @@ module.exports = generators.Base.extend({
   vampdInit: function () {
     var done = this.async(),
         prompts = [];
+    // Say something to start:
+    this.log(yosay('Welcome to VAMPD.'));
 
     this.machineId = this.config.get('machineId');
 
