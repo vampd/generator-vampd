@@ -37,6 +37,7 @@ module.exports = generators.Base.extend({
     if (this.options['new-role']) {
       locationTense = 'does'
     }
+
     this.vampdHome = this.config.get('vampdHome');
     prompts.push({
       type:'string',
@@ -44,8 +45,22 @@ module.exports = generators.Base.extend({
       default: this.config.get('vampdHome'),
       message: 'Where ' + locationTense + ' vampd live?',
     });
+
+    // Bind the initial prompts
+    this.prompt(prompts, function (answers) {
+      this.vampdHome = answers.vampdHome;
+      done();
+    }.bind(this));
+  },
+
+  // Get the IP address
+  vampdIP: function(){
+    var done = this.async(),
+        prompts = [];
+
+    this.vagrantIP = this.config.get('vagrantIP');
+
     if (this.options['new-role']) {
-      this.vagrantIP = this.config.get('vagrantIP');
       this.log('Your private vagrant IP can be found in your Vagrantfile');
       this.log("If you didn't touch this, just hit enter");
       prompts.push({
@@ -61,6 +76,17 @@ module.exports = generators.Base.extend({
         }
       });
     }
+    this.prompt(prompts, function (answers) {
+      if (this.options['new-role']) {
+        this.vagrantIP = answers.vagrantIP;
+      }
+      done();
+    }.bind(this));
+  },
+
+  vampdGitInit: function () {
+    var done = this.async(),
+        prompts = [];
     // Get the Machine ID
     this.machineId = this.config.get('machineId');
     prompts.push({
@@ -74,7 +100,7 @@ module.exports = generators.Base.extend({
         return true;
       }
     });
-
+    // See if an existing git repo exists
     prompts.push({
       type: 'confirm',
       name: 'git',
@@ -84,7 +110,6 @@ module.exports = generators.Base.extend({
 
     // Bind the initial prompts
     this.prompt(prompts, function (answers) {
-      this.vampdHome = answers.vampdHome;
       this.machineId = answers.machineId;
       this.git = answers.git;
       done();
@@ -432,24 +457,21 @@ module.exports = generators.Base.extend({
 
     this.template('role.json', this.vampdHome + '/chef/roles/' + mID +'.json');
 
-    // Add the ip to the /etc/hosts
-    sh.run('sudo echo ' + this.vagrantIP + '   ' + mID+ '.local'+ ' >> /etc/hosts');
-
     this.log("------");
     if ( this.options['new-role'] ) {
       this.log(chalk.green('Your new role is created and ready to use.'));
       this.log(chalk.magenta('If your site is ready to provision...'));
       this.log(chalk.cyan('vagrant provision') + ' in your working vampd directory');
-      this.log('and add the following line to your ' + chalk.cyan('/etc/hosts'));
-      this.log(chalk.cyan(this.vagrantIP + '   ' + mID + '.local'));
+
     } else {
       this.log(chalk.green('Your installation is complete'));
       this.log(chalk.green('Navigate to your project directory:'));
       this.log(chalk.cyan('cd' + this.vampdHome));
       this.log(chalk.green('and run the following command'));
       this.log(chalk.cyan('vagrant up'));
-      t
     }
+    this.log('and add the following line to your ' + chalk.cyan('/etc/hosts'));
+    this.log(chalk.cyan(this.vagrantIP + '   ' + mID + '.local'));
     this.log("------");
   },
 });
