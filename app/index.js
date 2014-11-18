@@ -33,6 +33,9 @@ module.exports = generators.Base.extend({
     var done = this.async(),
         prompts = [],
         locationTense = 'should';
+    // Say something to start:
+    this.log(yosay('Welcome to VAMPD.'));
+
     // Set location tense if a new role
     if (this.options['new-role']) {
       locationTense = 'does'
@@ -57,8 +60,7 @@ module.exports = generators.Base.extend({
   vampdIP: function(){
     var done = this.async(),
         prompts = [];
-    // Say something to start:
-    this.log(yosay('Welcome to VAMPD.'));
+
 
     this.vagrantIP = this.config.get('vagrantIP');
 
@@ -393,12 +395,19 @@ module.exports = generators.Base.extend({
     var done = this.async(),
         prompts = [];
     this.drupalSiteFiles = this.config.get('drupalSiteFiles');
+    if ( this.drupalDocrootInit ) {
+      if ( this.drupalDocroot === "" ) {
+        var docroot = "";
+      } else {
+        var docroot = this.drupalDocroot + '/';
+      }
+    }
     if ( this.git ) {
       prompts.push({
         type: 'string',
         name: 'drupalSiteFiles',
         message: 'Where do your site files live, relative to the docroot?' + chalk.red('(Required)'),
-        default: 'sites/default/files',
+        default:  docroot + 'sites/default/files',
         validate: function (answer) {
           if ( answer === '' ) {
             return 'Your files must live somewhere. Please give them a home.';
@@ -423,12 +432,20 @@ module.exports = generators.Base.extend({
 
     this.drupalSiteSettings = this.config.get('drupalSiteSettings');
 
+    if ( this.drupalDocrootInit ) {
+      if ( this.drupalDocroot === "" ) {
+        var docroot = "";
+      } else {
+        var docroot = this.drupalDocroot + '/';
+      }
+    }
+
     if ( this.git ) {
       prompts.push({
         type: 'string',
         name: 'drupalSiteSettings',
         message: 'Where does your sites settings.php live, relative to docroot?' + chalk.red('(Required)'),
-        default: 'sites/default/settings.php',
+        default: docroot + 'sites/default/settings.php',
         validate: function (answer) {
           if ( answer === '' ) {
             return 'Your settings.php must live somewhere. Please give it a home.';
@@ -457,7 +474,22 @@ module.exports = generators.Base.extend({
     // Set the destination root to where we specified.
     this.destinationRoot(this.vampdHome);
 
-    this.template('role.json', this.vampdHome + '/chef/roles/' + mID +'.json');
+    this.fs.copyTpl(
+      this.templatePath('role.json'),
+      this.destinationPath(this.vampdHome + '/chef/roles/' + mID +'.json'),
+      { machineId: this.machineId,
+        gitHost: this.gitHost,
+        gitURI: this.gitURI,
+        gitRevision: this.gitRevision,
+        drupalDocroot: this.drupalDocroot,
+        drupalProfile: this.drupalProfile,
+        actions: this.actions,
+        dbFile: this.dbFile,
+        drupalVersion: this.drupalVersion,
+        drupalSiteSettings: this.drupalSiteSettings,
+        drupalSiteFiles: this.drupalSiteFiles,
+      }
+    );
 
     this.log("------");
     if ( this.options['new-role'] ) {
@@ -468,7 +500,7 @@ module.exports = generators.Base.extend({
     } else {
       this.log(chalk.green('Your installation is complete'));
       this.log(chalk.green('Navigate to your project directory:'));
-      this.log(chalk.cyan('cd' + this.vampdHome));
+      this.log(chalk.cyan('cd ' + this.vampdHome));
       this.log(chalk.green('and run the following command'));
       this.log(chalk.cyan('vagrant up'));
     }

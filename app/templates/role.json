@@ -10,7 +10,7 @@
         "<%= machineId %>": {
           "active": true,
           "deploy": {
-            "action": <%= actionsJSON %>
+            "action": <%= actions %>
           },
           "drupal": {
             "version": "<%= drupalVersion %>",
