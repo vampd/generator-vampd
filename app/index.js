@@ -21,7 +21,7 @@ module.exports = generators.Base.extend({
       dbFile: '',
       drupalVersion: "7.x",
       drupalSiteSettings: 'sites/default/settings.php',
-      drupalSiteFiles: 'site/default/files',
+      drupalSiteFiles: 'sites/default/files',
       vagrantIP: '192.168.50.5'
     }
 
